@@ -111,4 +111,5 @@ function startBotActivities() {
 process.on('uncaughtException', (err) => console.log('🛡️ درع الحماية: ' + err));
 
 createBot();
-          
+
+        
