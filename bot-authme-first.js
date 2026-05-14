@@ -17,7 +17,7 @@ const botTelegram = new TelegramBot(telegramConfig.token, {
 });
 
 const config = {
-  server: { host: '193.56.156.142', port: 45379, version: '1.21.1' },
+  server: { host: 'MM2BXS3_.aternos.me', port: 45379, version: '1.21.1' },
   bot: { username: 'MyNewAFK24_bot', authmePassword: '7654321' },
   features: {
     autoReconnect: { enabled: true, delay: 30000 }, 
