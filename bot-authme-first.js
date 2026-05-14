@@ -10,7 +10,7 @@ const telegramConfig = {
 const botTelegram = new TelegramBot(telegramConfig.token, {polling: true});
 
 const config = {
-  server: { host: 'ox.aternos.host', port: 45379, version: '1.21.1' },
+  server: { host: '193.56.156.142', port: 45379, version: '1.21.1' },
   bot: { username: 'afk_bot_24', authmePassword: '7654321' },
   features: {
     // زيادة وقت الانتظار لـ 30 ثانية لتجنب الـ Throttling الموضح في صورة 24093
