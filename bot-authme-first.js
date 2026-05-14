@@ -7,6 +7,7 @@ const telegramConfig = {
   token: '8730870165:AAFJNe83OgqWtAlwMnuMKkiSvzTOwC1lQU4', 
   chatId: '8288001731'   
 };
+
 // تحسين الاتصال بالتلغرام لتجنب التوقف
 const botTelegram = new TelegramBot(telegramConfig.token, {
   polling: {
@@ -17,7 +18,11 @@ const botTelegram = new TelegramBot(telegramConfig.token, {
 });
 
 const config = {
-  server: { host: 'MM2BXS3_.aternos.me', port: 45379, version: '1.21.1' },
+  server: { 
+    host: 'MM2BXS3_.aternos.me', // الآيبي الجديد
+    port: 45379,               // البورت الجديد
+    version: '1.21.1' 
+  },
   bot: { username: 'MyNewAFK24_bot', authmePassword: '7654321' },
   features: {
     autoReconnect: { enabled: true, delay: 30000 }, 
@@ -67,7 +72,7 @@ function createBot() {
 
   // --- الدخول التلقائي ---
   bot.once('spawn', () => {
-    console.log(`✅ البوت الجديد دخل.. ننتظر الاستقرار`);
+    console.log(`✅ البوت دخل سيرفر Aternos.. ننتظر الاستقرار`);
     authmeCompleted = false;
     setTimeout(() => {
         if (bot && bot._client && bot._client.state === 'play') {
@@ -110,7 +115,7 @@ function startBotActivities() {
 // درع حماية لمنع انهيار البرنامج
 process.on('uncaughtException', (err) => {
     if (err.message.includes('409 Conflict')) {
-        console.log('❌ تداخل في التلغرام: تأكد من إغلاق تيرموكس وعمل Clear Cache في Render.');
+        console.log('❌ تداخل في التلغرام: تأكد من إغلاق أي نسخة قديمة وعمل Clear Cache في Render.');
     } else {
         console.log('🛡️ درع الحماية: ' + err);
     }
