@@ -2,18 +2,24 @@ const mineflayer = require('mineflayer');
 const { pathfinder } = require('mineflayer-pathfinder');
 const TelegramBot = require('node-telegram-bot-api');
 
-// إعدادات التلغرام
+// 1. إعدادات التلغرام (المعلومات الجديدة)
 const telegramConfig = {
-  token: '8696372248:AAHwMz-fkfpT3Safhf_OGy05duNu91ds7uo', 
+  token: '8730870165:AAFJNe83OgqWtAlwMnuMKkiSvzTOwC1lQU4', 
   chatId: '8288001731'   
 };
-const botTelegram = new TelegramBot(telegramConfig.token, {polling: true});
+// تحسين الاتصال بالتلغرام لتجنب التوقف
+const botTelegram = new TelegramBot(telegramConfig.token, {
+  polling: {
+    interval: 300,
+    autoStart: true,
+    params: { timeout: 10 }
+  }
+});
 
 const config = {
   server: { host: '193.56.156.142', port: 45379, version: '1.21.1' },
-  bot: { username: 'afk_bot_24', authmePassword: '7654321' },
+  bot: { username: 'MyNewAFK24_bot', authmePassword: '7654321' },
   features: {
-    // زيادة وقت الانتظار لـ 30 ثانية لتجنب الـ Throttling الموضح في صورة 24093
     autoReconnect: { enabled: true, delay: 30000 }, 
     antiAFK: { enabled: true, interval: 15000 }
   }
@@ -23,7 +29,7 @@ let bot;
 let authmeCompleted = false;
 
 function createBot() {
-  // 1. تنظيف الذاكرة بشكل جذري قبل كل محاولة جديدة (حل Heap Out of Memory)
+  // تنظيف الذاكرة والجلسات القديمة
   if (bot) {
     bot.removeAllListeners();
     try { bot.end(); } catch (e) {}
@@ -36,7 +42,7 @@ function createBot() {
     username: config.bot.username,
     version: config.server.version,
     auth: 'offline',
-    checkTimeoutInterval: 90000 // رفع وقت فحص الاتصال
+    checkTimeoutInterval: 90000
   });
 
   bot.loadPlugin(pathfinder);
@@ -55,13 +61,13 @@ function createBot() {
     const message = jsonMsg.toString();
     if (message.includes(config.bot.username)) return;
     if (message.trim().length > 0) {
-      botTelegram.sendMessage(telegramConfig.chatId, `💬 ${message}`);
+      botTelegram.sendMessage(telegramConfig.chatId, `💬 ${message}`).catch(() => {});
     }
   });
 
-  // --- الدخول التلقائي مع فحص الأمان ---
+  // --- الدخول التلقائي ---
   bot.once('spawn', () => {
-    console.log(`✅ البوت دخل.. ننتظر الاستقرار`);
+    console.log(`✅ البوت الجديد دخل.. ننتظر الاستقرار`);
     authmeCompleted = false;
     setTimeout(() => {
         if (bot && bot._client && bot._client.state === 'play') {
@@ -80,20 +86,14 @@ function createBot() {
     }
   });
 
-  // --- معالجة الأخطاء الذكية لتقليل الضغط على السيرفر والذاكرة ---
+  // --- معالجة الأخطاء ---
   bot.on('error', (err) => {
-    console.log(`⚠️ خطأ: ${err.message}`);
-    // إذا كان السيرفر يرفضك (Throttled)، ننتظر وقتاً أطول (60 ثانية)
-    let waitTime = config.features.autoReconnect.delay;
-    if (err.message.includes('throttled')) {
-        console.log("⏳ السيرفر يرفض الاتصال السريع، سننتظر دقيقة كاملة...");
-        waitTime = 60000;
-    }
-    setTimeout(createBot, waitTime);
+    console.log(`⚠️ خطأ في البوت: ${err.message}`);
+    setTimeout(createBot, config.features.autoReconnect.delay);
   });
 
   bot.on('end', () => {
-    console.log("📡 انقطع الاتصال.. جاري إعادة المحاولة.");
+    console.log("📡 انقطع الاتصال.. جاري إعادة المحاولة خلال 30 ثانية.");
     setTimeout(createBot, config.features.autoReconnect.delay);
   });
 }
@@ -107,9 +107,13 @@ function startBotActivities() {
     }, config.features.antiAFK.interval);
 }
 
-// درع حماية يمنع انهيار البرنامج عند أي خطأ غير متوقع
-process.on('uncaughtException', (err) => console.log('🛡️ درع الحماية: ' + err));
+// درع حماية لمنع انهيار البرنامج
+process.on('uncaughtException', (err) => {
+    if (err.message.includes('409 Conflict')) {
+        console.log('❌ تداخل في التلغرام: تأكد من إغلاق تيرموكس وعمل Clear Cache في Render.');
+    } else {
+        console.log('🛡️ درع الحماية: ' + err);
+    }
+});
 
 createBot();
-
-        
